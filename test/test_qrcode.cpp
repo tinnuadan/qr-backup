@@ -21,14 +21,22 @@
 #include "gtest/gtest.h"
 #include "qrcode_wrapper.h"
 
-void test_QrCodeGeneration()
+#include <algorithm>
+
+#include "image.h"
+
+#include <opencv2/opencv.hpp>
+
+template<typename T>
+cv::Mat_<T> img2cv(qrcode::Image<T> const& img)
 {
-    auto qrCode = qrcode::GenerateQrCode("https://zeit.de", qrcode::Options{});
-    cv::imwrite("test.png", qrCode);
+    cv::Mat_<T> result(img.height(), img.width());
+    std::copy(img.data().begin(), img.data().end(), result.ptr(0));
+    return result;
 }
 
 TEST(testMath, myCubeTest)
 {
     auto qrCode = qrcode::GenerateQrCode("https://zeit.de", qrcode::Options{});
-    cv::imwrite("test.png", qrCode);
+    cv::imwrite("test.png", img2cv(qrCode));
 }

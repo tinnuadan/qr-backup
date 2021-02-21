@@ -23,7 +23,7 @@
 #include <cstdint>
 #include <string>
 
-#include <opencv2/opencv.hpp>
+#include "image.h"
 
 namespace qrcode
 {
@@ -44,7 +44,7 @@ namespace qrcode
         int border = 1u;
     };
 
-    cv::Mat_<uint8_t> GenerateQrCode(std::string const& text, Options const options);
+    Image<uint8_t> GenerateQrCode(std::string const& text, Options const options);
 }
 
 #endif

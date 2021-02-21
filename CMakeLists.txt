@@ -12,17 +12,13 @@ if(PACKAGE_TESTS)
     add_subdirectory(test)
 endif()
 
-
-find_package( OpenCV REQUIRED )
-include_directories( ${OpenCV_INCLUDE_DIRS} )
-
 find_library(LIBQRCODEGEN qrcodegencpp)
 
 include_directories(src)
 
 add_executable(QRCode src/main.cpp)
 
-target_link_libraries( QRCode ${OpenCV_LIBS} ${LIBQRCODEGEN} )
+target_link_libraries( QRCode ${LIBQRCODEGEN} )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

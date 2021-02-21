@@ -20,13 +20,16 @@
 #include "qrcode_wrapper.h"
 #include <qrcodegen/QrCode.hpp>
 
+// stl
+#include <iostream>
+
 namespace qrcode
 {
-    cv::Mat_<uint8_t> GenerateQrCode(std::string const& text, Options const options)
+    Image<uint8_t> GenerateQrCode(std::string const& text, Options const options)
     {
         using namespace qrcodegen;
 
-        auto const err_correction_lvl = QrCode::Ecc::LOW;        
+        auto const err_correction_lvl = QrCode::Ecc::HIGH;        
         auto const qr = QrCode::encodeText(text.c_str(), err_correction_lvl);
         
         auto const px_size = static_cast<int>(options.pixel_size);
@@ -34,7 +37,7 @@ namespace qrcode
         auto const qr_size = qr.getSize();
         auto const wh_mat = (qr_size+2*border)*px_size;
 
-        auto result = cv::Mat_<uint8_t>(cv::Size2i(wh_mat, wh_mat), 0xFFu);
+        auto result = Image<uint8_t>(wh_mat, wh_mat);
 
         for(int y = 0; y < qr_size + 2*border; ++y)
         {
@@ -56,7 +59,7 @@ namespace qrcode
                     {
                         if(utils::in_range(matX+u, 0, wh_mat) && utils::in_range(matY+k, 0, wh_mat))
                         {
-                            result(matX+u, matY+k) = color;
+                            result.at(matX+u, matY+k) = color;
                         }
                         else
                         {
