@@ -17,9 +17,5 @@
 * under the License.
 */
 
-#ifndef QRCODE_QRCODE_H
-#define QRCODE_QRCODE_H
+#include "qrcode_wrapper.h"
 
-
-
-#endif
