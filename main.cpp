@@ -1,6 +1,8 @@
 
 // STL
+#include <cstring>
 #include <iostream>
+#include <memory>
 
 // C
 #include <fcntl.h>
@@ -57,7 +59,15 @@ int main()
     close (framebuffer_fd);
     return 0;
   }
+  // save current screeen
+  auto current_screen_data = std::make_unique<uint32_t[]>(data_size);
+  std::memcpy(current_screen_data.get(), framebuffer, data_byte_size);
 
+
+
+
+  // restore screen
+  std::memcpy(framebuffer, current_screen_data.get(), data_byte_size);
 
   std::cout << "cleaning up" << std::endl;
   munmap (framebuffer, data_byte_size);
