@@ -7,7 +7,10 @@ enable_testing()
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
-add_executable(QRCode main.cpp)
+
+include_directories( src )
+
+add_executable(QRCode src/main.cpp)
 target_link_libraries( QRCode ${OpenCV_LIBS} )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
