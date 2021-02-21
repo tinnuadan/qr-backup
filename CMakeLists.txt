@@ -12,10 +12,11 @@ endif()
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
+include_directories(src lib/qrcode/cpp)
 
-include_directories( src )
-
-add_executable(QRCode src/main.cpp)
+add_executable(QRCode src/main.cpp
+    lib/qrcode/cpp/QrCode.hpp
+    lib/qrcode/cpp/QrCode.cpp)
 target_link_libraries( QRCode ${OpenCV_LIBS} )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
