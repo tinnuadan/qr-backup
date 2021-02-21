@@ -19,5 +19,16 @@
 
 
 #include "gtest/gtest.h"
-#include "qrcode.h"
+#include "qrcode_wrapper.h"
 
+void test_QrCodeGeneration()
+{
+    auto qrCode = qrcode::GenerateQrCode("https://zeit.de", qrcode::Options{});
+    cv::imwrite("test.png", qrCode);
+}
+
+TEST(testMath, myCubeTest)
+{
+    auto qrCode = qrcode::GenerateQrCode("https://zeit.de", qrcode::Options{});
+    cv::imwrite("test.png", qrCode);
+}

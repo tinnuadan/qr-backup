@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.0.0)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/googletest" "lib/googletest")
 
-include_directories( "${PROJECT_SOURCE_DIR}/src" )
+include_directories( "${PROJECT_SOURCE_DIR}/src"  )
+
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+find_library(LIBQRCODEGEN qrcodegencpp)
 
 # keeping cache clean
 mark_as_advanced(
@@ -22,7 +30,7 @@ macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
     # link the Google test infrastructure, mocking library, and a default main fuction to
     # the test executable.  Remove g_test_main if writing your own main function.
-    target_link_libraries(${TESTNAME} gtest gmock gtest_main)
+    target_link_libraries(${TESTNAME} gtest gmock gtest_main ${OpenCV_LIBS} ${LIBQRCODEGEN})
     # gtest_discover_tests replaces gtest_add_tests,
     # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
     gtest_discover_tests(${TESTNAME}
@@ -33,4 +41,4 @@ macro(package_add_test TESTNAME)
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(test_qrcode test_qrcode.cpp ../src/qrcode.cpp)
+package_add_test(test_qrcode test_qrcode.cpp ../src/qrcode_wrapper.cpp)
