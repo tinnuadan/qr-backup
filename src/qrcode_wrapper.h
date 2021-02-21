@@ -27,24 +27,22 @@
 
 namespace qrcode
 {
-    namespace utils
+  namespace utils
+  {
+    template <typename T>
+    constexpr bool in_range(T value, T min, T max)
     {
-        template<typename T>
-        constexpr bool in_range(T value, T min, T max)
-        {
-            return value>=min && value<max;
-        }
+      return value >= min && value < max;
     }
+  }
 
-    struct Options
-    {
-        unsigned int width = 480u;
-        unsigned int height = 480u;
-        int pixel_size = 10u;
-        int border = 1u;
-    };
+  struct Options
+  {
+    int pixel_size = 10u;
+    int border = 1u;
+  };
 
-    Image<uint8_t> GenerateQrCode(std::string const& text, Options const options);
+  Image<uint8_t> GenerateQrCode(std::string const &text, Options const options);
 }
 
 #endif
