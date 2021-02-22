@@ -5,7 +5,7 @@ project(QRBackup VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(PACKAGE_TESTS "Build the tests" ON)
+option(PACKAGE_TESTS "Build the tests" OFF)
 if(PACKAGE_TESTS)
     enable_testing()
     include(GoogleTest)
