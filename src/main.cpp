@@ -19,8 +19,9 @@
 // STL
 #include <cstring>
 #include <iostream>
-#include <thread>
 #include <memory>
+#include <sstream>
+#include <thread>
 
 // C
 #include <fcntl.h>
@@ -40,6 +41,19 @@
 int main()
 {
   const char *fbdev = "/dev/fb0";
+
+  std::stringstream strstream;
+  {
+    std::string input_line;
+    while(std::getline(std::cin, input_line)) {
+        // std::getline(std::cin, input_line);
+        strstream << input_line;
+        std::cout << input_line << std::endl;
+    };
+  }
+  auto const message = strstream.str();
+
+
 
   std::cout << "opening frame buffer" << std::endl;
   auto framebuffer_fd = open(fbdev, O_RDWR);
@@ -65,10 +79,12 @@ int main()
     return 1;
   }
 
-  auto const qrCode = qrbackup::GenerateQrCode("https://zeit.de", qrbackup::Options{});
+  qrbackup::Options options;
+  options.pixel_size = 5;
+  auto const qrCode = qrbackup::GenerateQrCode(message, options);
   if (qrCode.width() > screen_width || qrCode.height() > screen_height)
   {
-    std::cerr << "QR Code too large" << std::endl;
+    std::cerr << "QR Code too large (" << qrCode.width() << "x" << qrCode.height() << ")" << std::endl; 
     close(framebuffer_fd);
     return 1;
   }
@@ -111,8 +127,19 @@ int main()
     }
   }
 
-  // wait a bit
-  std::this_thread::sleep_for(std::chrono::seconds(10));
+  // we need this little workaround to read from stdin since we read from it earlier until Ctrl+D is pressed
+  auto* fstdin = std::fopen("/dev/tty", "r");
+  if(fstdin == nullptr)
+  { 
+    std::cerr << "unable to open stdin, waiting 30s instead..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(30));
+  }
+  else
+  {
+    std::cout << "please press (enter) to exit" << std::endl;
+    fgetc(fstdin);
+    std::fclose(fstdin);
+  }
 
   // restore screen
   std::memcpy(framebuffer, current_screen_data.get(), data_byte_size);
