@@ -26,7 +26,7 @@
 #include <opencv2/opencv.hpp>
 
 template<typename T>
-cv::Mat_<T> img2cv(qrcode::Image<T> const& img)
+cv::Mat_<T> img2cv(qrbackup::Image<T> const& img)
 {
     cv::Mat_<T> result(img.height(), img.width());
     std::copy(img.data().begin(), img.data().end(), result.ptr(0));
@@ -35,6 +35,6 @@ cv::Mat_<T> img2cv(qrcode::Image<T> const& img)
 
 TEST(testMath, myCubeTest)
 {
-    auto qrCode = qrcode::GenerateQrCode("https://zeit.de", qrcode::Options{});
+    auto qrCode = qrbackup::GenerateQrCode("https://zeit.de", qrbackup::Options{});
     cv::imwrite("test.png", img2cv(qrCode));
 }

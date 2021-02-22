@@ -23,7 +23,7 @@
 // stl
 #include <iostream>
 
-namespace qrcode
+namespace qrbackup
 {
   Image<uint8_t> GenerateQrCode(std::string const &text, Options const options)
   {

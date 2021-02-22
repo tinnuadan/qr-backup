@@ -65,7 +65,7 @@ int main()
     return 1;
   }
 
-  auto const qrCode = qrcode::GenerateQrCode("https://zeit.de", qrcode::Options{});
+  auto const qrCode = qrbackup::GenerateQrCode("https://zeit.de", qrbackup::Options{});
   if (qrCode.width() > screen_width || qrCode.height() > screen_height)
   {
     std::cerr << "QR Code too large" << std::endl;
@@ -102,8 +102,8 @@ int main()
       auto const cvy = y - dy;
       auto const cvx = x - dx;
       uint32_t pixel = 0u;
-      if (qrcode::utils::in_range(cvx, 0, static_cast<int>(qrCode.width())) &&
-          qrcode::utils::in_range(cvy, 0, static_cast<int>(qrCode.height())))
+      if (qrbackup::utils::in_range(cvx, 0, static_cast<int>(qrCode.width())) &&
+          qrbackup::utils::in_range(cvy, 0, static_cast<int>(qrCode.height())))
       {
         pixel = qrCode.at(cvx, cvy) == 0u ? 0u : 0xFFFFFFFF;
       }

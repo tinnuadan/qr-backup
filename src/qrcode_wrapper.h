@@ -16,15 +16,15 @@
 *
 */
 
-#ifndef QRCODE_QRCODE_WRAPPER_H
-#define QRCODE_QRCODE_WRAPPER_H
+#ifndef QRBACKUP_QRCODE_WRAPPER_H
+#define QRBACKUP_QRCODE_WRAPPER_H
 
 #include <cstdint>
 #include <string>
 
 #include "image.h"
 
-namespace qrcode
+namespace qrbackup
 {
   namespace utils
   {
@@ -44,4 +44,4 @@ namespace qrcode
   Image<uint8_t> GenerateQrCode(std::string const &text, Options const options);
 }
 
-#endif
+#endif //QRBACKUP_QRCODE_WRAPPER_H
