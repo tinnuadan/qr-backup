@@ -17,11 +17,10 @@
 * under the License.
 */
 
-
-
 // STL
 #include <cstring>
 #include <iostream>
+#include <thread>
 #include <memory>
 
 // C
@@ -35,35 +34,43 @@
 // Linux
 #include <linux/fb.h>
 
-
-
+// project
+#include "image.h"
+#include "qrcode_wrapper.h"
 
 int main()
 {
-  const char* fbdev = "/dev/fb0";
+  const char *fbdev = "/dev/fb0";
 
   std::cout << "opening frame buffer" << std::endl;
-  auto framebuffer_fd = open (fbdev, O_RDWR);
-  if(framebuffer_fd <= 0)
+  auto framebuffer_fd = open(fbdev, O_RDWR);
+  if (framebuffer_fd <= 0)
   {
     std::cerr << "unable to open " << fbdev << std::endl;
     return 1;
   }
 
-
   std::cout << "finding screen dimensions" << std::endl;
   struct fb_var_screeninfo vinfo;
 
-  ioctl (framebuffer_fd, FBIOGET_VSCREENINFO, &vinfo);
+  ioctl(framebuffer_fd, FBIOGET_VSCREENINFO, &vinfo);
 
   auto const screen_width = vinfo.xres;
   auto const screen_height = vinfo.yres;
   auto const screen_bpp = vinfo.bits_per_pixel;
-  
-  if(screen_bpp != 32u)
+
+  if (screen_bpp != 32u)
   {
     std::cerr << "display must have 32 bits per pixel" << std::endl;
-    close (framebuffer_fd);
+    close(framebuffer_fd);
+    return 1;
+  }
+
+  auto const qrCode = qrcode::GenerateQrCode("https://zeit.de", qrcode::Options{});
+  if (qrCode.width() > screen_width || qrCode.height() > screen_height)
+  {
+    std::cerr << "QR Code too large" << std::endl;
+    close(framebuffer_fd);
     return 1;
   }
 
@@ -71,26 +78,48 @@ int main()
   auto const data_size = screen_width * screen_height;
   auto const data_byte_size = data_size * screen_bpp / 8;
 
-
-  auto *framebuffer = static_cast<uint32_t*> (mmap (0, data_byte_size, PROT_READ | PROT_WRITE, MAP_SHARED, framebuffer_fd, (off_t)0));
-  if(framebuffer == nullptr)
+  auto *framebuffer = static_cast<uint32_t *>(mmap(0, data_byte_size, PROT_READ | PROT_WRITE, MAP_SHARED, framebuffer_fd, (off_t)0));
+  if (framebuffer == nullptr)
   {
     std::cerr << "unable to get framebuffer" << std::endl;
-    close (framebuffer_fd);
+    close(framebuffer_fd);
     return 0;
   }
   // save current screeen
   auto current_screen_data = std::make_unique<uint32_t[]>(data_size);
   std::memcpy(current_screen_data.get(), framebuffer, data_byte_size);
 
+  // display qr code
+  auto const dx = static_cast<int>((screen_width - qrCode.width()) / 2);
+  auto const dy = static_cast<int>((screen_height - qrCode.height()) / 2);
 
+  std::cout << "display" << std::endl;
+  for (auto y = 0; y < static_cast<int>(screen_height); ++y)
+  {
+    auto const cvy = y - dy;
+    for (auto x = 0; x < static_cast<int>(screen_width); ++x)
+    {
+      auto const i = y * screen_width + x;
+      auto const cvy = y - dy;
+      auto const cvx = x - dx;
+      uint32_t pixel = 0u;
+      if (qrcode::utils::in_range(cvx, 0, static_cast<int>(qrCode.width())) &&
+          qrcode::utils::in_range(cvy, 0, static_cast<int>(qrCode.height())))
+      {
+        pixel = qrCode.at(cvx, cvy) == 0u ? 0u : 0xFFFFFFFF;
+      }
+      *(framebuffer + i) = pixel;
+    }
+  }
 
+  // wait a bit
+  std::this_thread::sleep_for(std::chrono::seconds(10));
 
   // restore screen
   std::memcpy(framebuffer, current_screen_data.get(), data_byte_size);
 
   std::cout << "cleaning up" << std::endl;
-  munmap (framebuffer, data_byte_size);
-  close (framebuffer_fd);
+  munmap(framebuffer, data_byte_size);
+  close(framebuffer_fd);
   return 0;
 }

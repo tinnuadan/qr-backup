@@ -18,6 +18,7 @@
 */
 
 #include "qrcode_wrapper.h"
+#include <stdexcept> // needed for QrCode.hpp 1.4.0-1
 #include <qrcodegen/QrCode.hpp>
 
 // stl

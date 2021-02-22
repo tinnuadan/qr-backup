@@ -16,7 +16,7 @@ find_library(LIBQRCODEGEN qrcodegencpp)
 
 include_directories(src)
 
-add_executable(QRCode src/main.cpp)
+add_executable(QRCode src/main.cpp src/qrcode_wrapper.cpp)
 
 target_link_libraries( QRCode ${LIBQRCODEGEN} )
 
