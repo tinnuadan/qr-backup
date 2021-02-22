@@ -53,8 +53,6 @@ int main()
   }
   auto const message = strstream.str();
 
-
-
   std::cout << "opening frame buffer" << std::endl;
   auto framebuffer_fd = open(fbdev, O_RDWR);
   if (framebuffer_fd <= 0)
@@ -100,9 +98,6 @@ int main()
     close(framebuffer_fd);
     return 0;
   }
-  // save current screeen
-  auto current_screen_data = std::make_unique<uint32_t[]>(data_size);
-  std::memcpy(current_screen_data.get(), framebuffer, data_byte_size);
 
   // display qr code
   auto const dx = static_cast<int>((screen_width - qrCode.width()) / 2);
@@ -131,21 +126,22 @@ int main()
   auto* fstdin = std::fopen("/dev/tty", "r");
   if(fstdin == nullptr)
   { 
-    std::cerr << "unable to open stdin, waiting 30s instead..." << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(30));
   }
   else
   {
-    std::cout << "please press (enter) to exit" << std::endl;
     fgetc(fstdin);
     std::fclose(fstdin);
   }
 
-  // restore screen
-  std::memcpy(framebuffer, current_screen_data.get(), data_byte_size);
+  // clear screen
+  std::memset(framebuffer, 0, data_byte_size);
 
-  std::cout << "cleaning up" << std::endl;
+  // cleaning up memory
   munmap(framebuffer, data_byte_size);
   close(framebuffer_fd);
+
+  // get a clear console
+  system("clear");
   return 0;
 }
