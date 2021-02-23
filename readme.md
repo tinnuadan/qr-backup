@@ -39,3 +39,29 @@ GPG_TTY=$(tty)
 export GPG_TTY
 ```
 to your `~/.bashrc` which is especially important if you run gpg on a PC without a window manager
+
+## Building the unit tests
+### Additional prequisites
+Install opencv
+```
+$ apt install libopencv-dev
+```
+Get the google test framework
+```
+$ cd qr-backup
+$ git submodule init
+$ git submodule update
+```
+### Build the code and the tests
+```
+$ cd qr-backup
+$ mkdir build
+$ cd build
+$ cmake ../ -DPACKAGE_TESTS ON
+$ make
+```
+### Run the tests
+```
+# in qr-backup/build
+$ ctest
+```

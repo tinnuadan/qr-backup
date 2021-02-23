@@ -42,3 +42,4 @@ macro(package_add_test TESTNAME)
 endmacro()
 
 package_add_test(test_qrcode test_qrcode.cpp ../src/qrcode_wrapper.cpp)
+package_add_test(test_image test_image.cpp ../src/image.h)

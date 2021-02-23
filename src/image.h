@@ -20,6 +20,7 @@
 #define QRBACKUP_IMAGE_H
 
 // STL
+#include <stdexcept>
 #include <vector>
 
 namespace qrbackup
@@ -36,11 +37,19 @@ namespace qrbackup
 
       T at(unsigned int x, unsigned int y) const
       {
+        if(x >= _width || y >= _height)
+        {
+          throw std::out_of_range("index not valid");
+        }
         return _data.at(y*_width+x);
       }
 
       T& at(unsigned int x, unsigned int y)
       {
+        if(x >= _width || y >= _height)
+        {
+          throw std::out_of_range("index not valid");
+        }
         return _data[y*_width+x];
       }
 
