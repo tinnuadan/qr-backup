@@ -25,16 +25,33 @@
 
 #include <opencv2/opencv.hpp>
 
-template<typename T>
-cv::Mat_<T> img2cv(qrbackup::Image<T> const& img)
+
+template <typename T>
+cv::Mat_<T> img2cv(qrbackup::Image<T> const &img)
 {
-    cv::Mat_<T> result(img.height(), img.width());
-    std::copy(img.data().begin(), img.data().end(), result.ptr(0));
-    return result;
+  cv::Mat_<T> result(img.height(), img.width());
+  std::copy(img.data().begin(), img.data().end(), result.ptr(0));
+  return result;
 }
 
-TEST(testMath, myCubeTest)
+TEST(testQrBackup, testGeneration)
 {
-    auto qrCode = qrbackup::GenerateQrCode("https://zeit.de", qrbackup::Options{});
-    cv::imwrite("test.png", img2cv(qrCode));
+  const char *phrase = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+
+  qrbackup::Options options{};
+
+  for (int i = 2; i <= 10; i += 2)
+  {
+    std::stringstream filename;
+    filename << "./testdata/qrcode_" << i << ".png";
+    options.pixel_size = i;
+
+    cv::Mat_<uint8_t> const groundTruth = cv::imread(filename.str(), cv::IMREAD_GRAYSCALE);
+    auto const qrCode = qrbackup::GenerateQrCode(phrase, options);
+
+    EXPECT_EQ(groundTruth.cols, qrCode.width());
+    EXPECT_EQ(groundTruth.rows, qrCode.height());
+    auto const size = std::min(static_cast<size_t>(groundTruth.cols*groundTruth.rows), qrCode.data().size());
+    EXPECT_TRUE(std::memcmp(groundTruth.data, qrCode.data().data(), size)==0);
+  }
 }
